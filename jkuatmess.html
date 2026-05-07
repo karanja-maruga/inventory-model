@@ -1,0 +1,2297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jkuat Mess</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --surface-muted: #f1ede5;
+    --ink: #1a1a1a;
+    --ink-soft: #4a4a4a;
+    --ink-faint: #8a8680;
+    --rule: #e5e0d5;
+    --accent: #c8583a;
+    --accent-soft: #f4dcd2;
+    --good: #3a6b4a;
+    --good-soft: #dce8df;
+    --warn: #c89a3a;
+    --warn-soft: #f4ead2;
+    --danger: #a83333;
+    --danger-soft: #f0d6d6;
+    --shadow-sm: 0 1px 2px rgba(26, 26, 26, 0.04);
+    --shadow-md: 0 4px 12px rgba(26, 26, 26, 0.06);
+    --shadow-lg: 0 12px 32px rgba(26, 26, 26, 0.08);
+    --sans: 'Inter Tight', -apple-system, sans-serif;
+    --serif: 'Fraunces', Georgia, serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    height: 100vh;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--rule);
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .brand {
+    margin-bottom: 36px;
+  }
+
+  .brand-mark {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 26px;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .brand-mark::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-right: 2px;
+  }
+
+  .brand-sub {
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 6px;
+    font-weight: 500;
+  }
+
+  .nav-section {
+    margin-bottom: 24px;
+  }
+
+  .nav-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+    padding: 0 10px;
+    margin-bottom: 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 2px;
+  }
+
+  .nav-item:hover {
+    background: var(--surface-muted);
+    color: var(--ink);
+  }
+
+  .nav-item.active {
+    background: var(--ink);
+    color: var(--surface);
+  }
+
+  .nav-item.active .nav-dot {
+    background: var(--accent);
+  }
+
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ink-faint);
+    flex-shrink: 0;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-size: 11px;
+    color: var(--ink-faint);
+    line-height: 1.6;
+  }
+
+  /* ===== MAIN ===== */
+  .main {
+    overflow-y: auto;
+    background: var(--bg);
+  }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--rule);
+    padding: 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .topbar-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .topbar-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .topbar-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  .pill {
+    background: var(--good-soft);
+    color: var(--good);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+
+  .pill-live::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--good);
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .content {
+    padding: 32px 40px 60px;
+    max-width: 1400px;
+  }
+
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== TYPOGRAPHY ===== */
+  .section-title {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .section-sub {
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin-bottom: 28px;
+    max-width: 720px;
+  }
+
+  h3 {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .card-sub {
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+  }
+
+  /* ===== TABS ===== */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 24px;
+  }
+
+  .tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-faint);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s;
+  }
+
+  .tab:hover { color: var(--ink-soft); }
+
+  .tab.active {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .grid {
+    display: grid;
+    gap: 16px;
+  }
+
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+  /* ===== METRICS ===== */
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .metric-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .metric-value {
+    font-family: var(--serif);
+    font-size: 32px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .metric-delta {
+    font-size: 12px;
+    margin-top: 8px;
+    font-family: var(--mono);
+  }
+
+  .metric-delta.up { color: var(--good); }
+  .metric-delta.down { color: var(--danger); }
+
+  /* ===== CHARTS ===== */
+  .chart-wrap {
+    position: relative;
+    height: 280px;
+    margin-top: 12px;
+  }
+
+  .chart-wrap-sm { height: 200px; }
+  .chart-wrap-lg { height: 360px; }
+
+  /* ===== TABLES ===== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--rule);
+    font-weight: 600;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-soft);
+  }
+
+  tr.expandable { cursor: pointer; transition: background 0.1s; }
+  tr.expandable:hover { background: var(--surface-muted); }
+
+  tr.expansion td {
+    background: var(--surface-muted);
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .class-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    font-family: var(--mono);
+  }
+
+  .class-A { background: var(--danger-soft); color: var(--danger); }
+  .class-B { background: var(--warn-soft); color: var(--warn); }
+  .class-C { background: var(--good-soft); color: var(--good); }
+
+  .num { font-family: var(--mono); font-size: 12px; }
+
+  /* ===== CONTROLS ===== */
+  .control-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+  }
+
+  .control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 140px;
+  }
+
+  .control label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+
+  select, input[type=number] {
+    padding: 8px 12px;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background: var(--surface);
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  select:focus, input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .slider-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 180px;
+  }
+
+  .slider-wrap .value {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink);
+  }
+
+  input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .btn {
+    padding: 9px 18px;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--surface);
+  }
+
+  .btn-primary:hover { background: var(--accent); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--rule);
+  }
+
+  .btn-ghost:hover { background: var(--surface-muted); }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 26, 26, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
+
+  .modal {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 680px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .modal-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+
+  .modal-close {
+    float: right;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--ink-faint);
+  }
+
+  .formula {
+    background: var(--surface-muted);
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 13px;
+    margin: 12px 0;
+    border-left: 3px solid var(--accent);
+  }
+
+  /* ===== FEEDBACK LOOP DIAGRAM ===== */
+  .loop-diagram {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .loop-node {
+    padding: 10px 14px;
+    background: var(--surface-muted);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  /* ===== STATUS INDICATORS ===== */
+  .status-row {
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-soft);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .status-dot.good { background: var(--good); }
+  .status-dot.warn { background: var(--warn); }
+  .status-dot.danger { background: var(--danger); }
+
+  .log-stream {
+    background: var(--surface-muted);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    max-height: 180px;
+    overflow-y: auto;
+    line-height: 1.7;
+  }
+
+  .log-stream .log-time { color: var(--ink-faint); }
+  .log-stream .log-ok { color: var(--good); }
+  .log-stream .log-warn { color: var(--warn); }
+  .log-stream .log-err { color: var(--danger); }
+
+  /* ===== PIPELINE VIZ ===== */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    position: relative;
+  }
+
+  .pipeline-step {
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    position: relative;
+  }
+
+  .pipeline-step::after {
+    content: "→";
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-faint);
+    font-size: 18px;
+    z-index: 2;
+  }
+
+  .pipeline-step:last-child::after { display: none; }
+
+  .pipeline-num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .pipeline-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .pipeline-desc {
+    font-size: 11px;
+    color: var(--ink-faint);
+    line-height: 1.5;
+  }
+
+  .scenario-result {
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--rule);
+  }
+
+  .scenario-result.ok { border-left-color: var(--good); background: var(--good-soft); }
+  .scenario-result.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+  .scenario-result.bad { border-left-color: var(--danger); background: var(--danger-soft); }
+
+  .scenario-title { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+  .scenario-metric { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  @media (max-width: 1100px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pipeline { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">Jkuat Mess</div>
+      <div class="brand-sub">Inventory Intelligence</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" data-page="dashboard">
+        <span class="nav-dot"></span>Dashboard
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Models</div>
+      <div class="nav-item" data-page="forecast">
+        <span class="nav-dot"></span>Demand Forecast
+      </div>
+      <div class="nav-item" data-page="policy">
+        <span class="nav-dot"></span>Inventory Policy
+      </div>
+      <div class="nav-item" data-page="dynamics">
+        <span class="nav-dot"></span>System Dynamics
+      </div>
+      <div class="nav-item" data-page="stress">
+        <span class="nav-dot"></span>Scenario Stress Test
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Reference</div>
+      <div class="nav-item" data-page="inventory">
+        <span class="nav-dot"></span>Inventory Catalogue
+      </div>
+      <div class="nav-item" data-page="methodology">
+        <span class="nav-dot"></span>Methodology
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      Probabilistic inventory framework integrating ML forecasting, newsvendor &amp; (Q,R) policies, and system dynamics simulation.
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">The <em>Jkuat Mess place</em> of analytics</div>
+      <div class="topbar-meta">
+        <span class="pill pill-live">Synthetic POS · Live</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ========== DASHBOARD ========== -->
+      <section class="page active" id="page-dashboard">
+        <div class="section-title">Operations at a glance</div>
+        <div class="section-sub">A probabilistic inventory system for a mid-sized restaurant — integrating learned demand distributions, class-specific ordering policies, and feedback-loop simulation.</div>
+
+        <div class="grid grid-4" style="margin-bottom: 24px;">
+          <div class="metric">
+            <div class="metric-label">Forecast Accuracy (MAPE)</div>
+            <div class="metric-value" id="m-mape">8.4%</div>
+            <div class="metric-delta up">▲ 2.1pp vs. naïve baseline</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Service Level</div>
+            <div class="metric-value" id="m-service">96.2%</div>
+            <div class="metric-delta up">▲ within target (95%)</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Weekly Spoilage</div>
+            <div class="metric-value" id="m-spoil">3.1%</div>
+            <div class="metric-delta down">▼ 1.4pp vs. last period</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Expected Cost / wk</div>
+            <div class="metric-value" id="m-cost">KSh 184k</div>
+            <div class="metric-delta up">▼ 11% vs. deterministic EOQ</div>
+          </div>
+        </div>
+
+        <div class="grid grid-2" style="margin-bottom: 24px;">
+          <div class="card">
+            <h3>Demand vs. Actual — Past 14 Days</h3>
+            <div class="card-sub">ML-predicted distribution (shaded 80% interval) against realised POS demand.</div>
+            <div class="chart-wrap"><canvas id="chart-demand-actual"></canvas></div>
+          </div>
+          <div class="card">
+            <h3>Cost Decomposition</h3>
+            <div class="card-sub">Weekly expected cost by class and cost category (simulation average).</div>
+            <div class="chart-wrap"><canvas id="chart-cost-decomp"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Items requiring attention</h3>
+          <div class="card-sub">Click a row for policy details and the underlying probability distribution.</div>
+          <table id="attention-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Class</th>
+                <th>On Hand</th>
+                <th>Reorder Point</th>
+                <th>Policy</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="attention-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ========== DEMAND FORECAST ========== -->
+      <section class="page" id="page-forecast">
+        <div class="section-title">ML demand forecast</div>
+        <div class="section-sub">The "AI" layer. Historical POS data feeds a gradient-boosted regression model that predicts conditional demand distributions — not point estimates. Covariates: day of week, service period, weather, local events.</div>
+
+        <div class="tabs">
+          <div class="tab active" data-tab="f-overview">Pipeline</div>
+          <div class="tab" data-tab="f-item">Per-item forecast</div>
+          <div class="tab" data-tab="f-features">Feature importance</div>
+          <div class="tab" data-tab="f-diagnostics">Model diagnostics</div>
+        </div>
+
+        <div class="tab-panel active" id="tab-f-overview">
+          <div class="pipeline" style="margin-bottom: 24px;">
+            <div class="pipeline-step">
+              <div class="pipeline-num">01</div>
+              <div class="pipeline-title">POS history</div>
+              <div class="pipeline-desc">180 days × 40 SKUs of synthetic transaction data with seasonality &amp; weather effects.</div>
+            </div>
+            <div class="pipeline-step">
+              <div class="pipeline-num">02</div>
+              <div class="pipeline-title">Feature engineering</div>
+              <div class="pipeline-desc">Lag features, rolling means, calendar encodings, weather joins, event flags.</div>
+            </div>
+            <div class="pipeline-step">
+              <div class="pipeline-num">03</div>
+              <div class="pipeline-title">Quantile regression</div>
+              <div class="pipeline-desc">Models P10, P50, P90 jointly → conditional demand distribution per item per service period.</div>
+            </div>
+            <div class="pipeline-step">
+              <div class="pipeline-num">04</div>
+              <div class="pipeline-title">Policy handoff</div>
+              <div class="pipeline-desc">Distribution parameters (μ, σ) piped to the inventory policy engine.</div>
+            </div>
+          </div>
+
+          <div class="grid grid-3" style="margin-bottom: 16px;">
+            <div class="metric">
+              <div class="metric-label">Training Records</div>
+              <div class="metric-value">7,200</div>
+              <div class="metric-delta up">180 days × 40 SKUs</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Cross-Val MAPE</div>
+              <div class="metric-value">8.4%</div>
+              <div class="metric-delta up">vs. 15.2% naïve</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Coverage @ 80%</div>
+              <div class="metric-value">81.7%</div>
+              <div class="metric-delta up">Well-calibrated</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Aggregate demand — predicted bands vs. actual</h3>
+            <div class="card-sub">Total daily covers across all menu categories. Shaded region is the 80% prediction interval.</div>
+            <div class="chart-wrap chart-wrap-lg"><canvas id="chart-forecast-agg"></canvas></div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="tab-f-item">
+          <div class="control-row">
+            <div class="control">
+              <label>Item</label>
+              <select id="forecast-item-select"></select>
+            </div>
+            <div class="control">
+              <label>Service period</label>
+              <select id="forecast-period-select">
+                <option value="lunch">Lunch</option>
+                <option value="dinner" selected>Dinner</option>
+                <option value="all">All day</option>
+              </select>
+            </div>
+            <div class="control">
+              <label>Horizon (days)</label>
+              <select id="forecast-horizon-select">
+                <option>7</option>
+                <option selected>14</option>
+                <option>30</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="card">
+              <h3>Forecast trajectory</h3>
+              <div class="card-sub">Point forecast with 80% and 95% intervals.</div>
+              <div class="chart-wrap"><canvas id="chart-forecast-item"></canvas></div>
+            </div>
+            <div class="card">
+              <h3>Demand distribution — next service</h3>
+              <div class="card-sub">Probability density learned from conditional covariates.</div>
+              <div class="chart-wrap"><canvas id="chart-forecast-pdf"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="tab-f-features">
+          <div class="card">
+            <h3>Feature importance (SHAP values)</h3>
+            <div class="card-sub">What the model has learned to pay attention to.</div>
+            <div class="chart-wrap chart-wrap-lg"><canvas id="chart-features"></canvas></div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="tab-f-diagnostics">
+          <div class="grid grid-2">
+            <div class="card">
+              <h3>Residual distribution</h3>
+              <div class="card-sub">Prediction errors should be centred on zero and approximately symmetric.</div>
+              <div class="chart-wrap"><canvas id="chart-residuals"></canvas></div>
+            </div>
+            <div class="card">
+              <h3>Calibration plot</h3>
+              <div class="card-sub">Predicted probabilities vs. empirical frequencies — diagonal = perfect calibration.</div>
+              <div class="chart-wrap"><canvas id="chart-calibration"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== INVENTORY POLICY ========== -->
+      <section class="page" id="page-policy">
+        <div class="section-title">Inventory policy engine</div>
+        <div class="section-sub">Three class-specific models apply simultaneously. The forecast distributions become inputs — the engine solves for optimal order quantities and reorder points.</div>
+
+        <div class="tabs">
+          <div class="tab active" data-tab="p-news">Newsvendor (Class A)</div>
+          <div class="tab" data-tab="p-qr">(Q,R) Policy (Class C)</div>
+          <div class="tab" data-tab="p-rolling">Rolling Horizon (Class B)</div>
+        </div>
+
+        <div class="tab-panel active" id="tab-p-news">
+          <div class="control-row">
+            <div class="control">
+              <label>Item</label>
+              <select id="nv-item"></select>
+            </div>
+            <div class="slider-wrap">
+              <label>Unit cost (Cu — understock) <span class="value" id="nv-cu-val">KSh 450</span></label>
+              <input type="range" id="nv-cu" min="100" max="800" step="10" value="450">
+            </div>
+            <div class="slider-wrap">
+              <label>Unit cost (Co — overstock) <span class="value" id="nv-co-val">KSh 180</span></label>
+              <input type="range" id="nv-co" min="20" max="400" step="10" value="180">
+            </div>
+          </div>
+
+          <div class="grid grid-4" style="margin-bottom: 16px;">
+            <div class="metric">
+              <div class="metric-label">Critical Ratio</div>
+              <div class="metric-value" id="nv-cr">0.71</div>
+              <div class="metric-delta up">Cu / (Cu + Co)</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Optimal Q*</div>
+              <div class="metric-value" id="nv-qstar">38</div>
+              <div class="metric-delta up">units / service period</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Expected Profit</div>
+              <div class="metric-value" id="nv-profit">KSh 12.4k</div>
+              <div class="metric-delta up">per service period</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">P(Stockout)</div>
+              <div class="metric-value" id="nv-stockout">29%</div>
+              <div class="metric-delta up">at Q*</div>
+            </div>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="card">
+              <h3>Expected cost as a function of Q</h3>
+              <div class="card-sub">Underage + overage costs combine; the minimum identifies Q*.</div>
+              <div class="chart-wrap"><canvas id="chart-nv-cost"></canvas></div>
+            </div>
+            <div class="card">
+              <h3>Demand distribution with Q* overlay</h3>
+              <div class="card-sub">The critical ratio determines which quantile of demand Q* should meet.</div>
+              <div class="chart-wrap"><canvas id="chart-nv-dist"></canvas></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 16px;">
+            <h3>Formula</h3>
+            <div class="formula">
+              Q* = F⁻¹ ( Cu / (Cu + Co) )<br>
+              where F⁻¹ is the inverse CDF of the learned demand distribution.
+            </div>
+            <p style="color:var(--ink-soft); font-size: 13px; margin-top: 8px;">
+              For perishables, this answers the newsvendor question: stock enough to cover demand with probability equal to the critical ratio. Slide the cost sliders above to see how Q* responds — higher understock cost pushes Q* up.
+            </p>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="tab-p-qr">
+          <div class="control-row">
+            <div class="control">
+              <label>Item</label>
+              <select id="qr-item"></select>
+            </div>
+            <div class="slider-wrap">
+              <label>Service level target <span class="value" id="qr-sl-val">95%</span></label>
+              <input type="range" id="qr-sl" min="80" max="99" step="1" value="95">
+            </div>
+            <div class="slider-wrap">
+              <label>Lead time (days) <span class="value" id="qr-lt-val">3</span></label>
+              <input type="range" id="qr-lt" min="1" max="10" step="1" value="3">
+            </div>
+          </div>
+
+          <div class="grid grid-4" style="margin-bottom: 16px;">
+            <div class="metric">
+              <div class="metric-label">EOQ</div>
+              <div class="metric-value" id="qr-eoq">82</div>
+              <div class="metric-delta up">√(2DS/H)</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Reorder Point R</div>
+              <div class="metric-value" id="qr-r">47</div>
+              <div class="metric-delta up">μL + z·σL</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Safety Stock</div>
+              <div class="metric-value" id="qr-ss">12</div>
+              <div class="metric-delta up">z·σL</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Cycles / year</div>
+              <div class="metric-value" id="qr-cycles">18</div>
+              <div class="metric-delta up">D / Q*</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Inventory trajectory — (Q,R) simulated over 90 days</h3>
+            <div class="card-sub">Sawtooth pattern shows reorder cycles. Red band = stockout zone.</div>
+            <div class="chart-wrap chart-wrap-lg"><canvas id="chart-qr-traj"></canvas></div>
+          </div>
+
+          <div class="card" style="margin-top: 16px;">
+            <h3>Formula</h3>
+            <div class="formula">
+              Q* = √(2 · D · S / H)  ← EOQ<br>
+              R = μ<sub>L</sub> + z<sub>α</sub> · σ<sub>L</sub>  ← reorder point<br>
+              Safety Stock = z<sub>α</sub> · σ<sub>L</sub>
+            </div>
+            <p style="color:var(--ink-soft); font-size: 13px; margin-top: 8px;">
+              D = annual demand, S = setup cost, H = holding cost/unit/year, μ<sub>L</sub> = mean lead-time demand, σ<sub>L</sub> = std dev of lead-time demand, z<sub>α</sub> = service-level z-score.
+            </p>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="tab-p-rolling">
+          <div class="control-row">
+            <div class="control">
+              <label>Item</label>
+              <select id="rh-item"></select>
+            </div>
+            <div class="slider-wrap">
+              <label>Horizon length (days) <span class="value" id="rh-h-val">5</span></label>
+              <input type="range" id="rh-h" min="3" max="7" step="1" value="5">
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Rolling horizon plan — next 5 days</h3>
+            <div class="card-sub">Each day, we re-optimise the order sequence. Only tomorrow's order is committed; the rest is provisional.</div>
+            <div class="chart-wrap chart-wrap-lg"><canvas id="chart-rh"></canvas></div>
+          </div>
+
+          <div class="grid grid-3" style="margin-top: 16px;">
+            <div class="metric">
+              <div class="metric-label">Planned Order Tomorrow</div>
+              <div class="metric-value" id="rh-tomorrow">42</div>
+              <div class="metric-delta up">committed</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Expected Spoilage</div>
+              <div class="metric-value" id="rh-spoil">2.8%</div>
+              <div class="metric-delta up">over horizon</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Plan Cost</div>
+              <div class="metric-value" id="rh-cost">KSh 8.6k</div>
+              <div class="metric-delta up">5-day total</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== SYSTEM DYNAMICS ========== -->
+      <section class="page" id="page-dynamics">
+        <div class="section-title">System dynamics</div>
+        <div class="section-sub">The inventory system has feedback loops that no single-item policy can see. This simulation captures the causal structure: how manager behaviour, supplier reliability, and demand signals interact over time.</div>
+
+        <div class="control-row">
+          <div class="slider-wrap">
+            <label>Manager over-reaction (β) <span class="value" id="sd-beta-val">0.60</span></label>
+            <input type="range" id="sd-beta" min="0" max="1" step="0.05" value="0.6">
+          </div>
+          <div class="slider-wrap">
+            <label>Supplier reliability <span class="value" id="sd-rel-val">90%</span></label>
+            <input type="range" id="sd-rel" min="60" max="100" step="1" value="90">
+          </div>
+          <div class="slider-wrap">
+            <label>Demand signal lag (days) <span class="value" id="sd-lag-val">2</span></label>
+            <input type="range" id="sd-lag" min="0" max="5" step="1" value="2">
+          </div>
+          <div class="slider-wrap">
+            <label>Sim length (days) <span class="value" id="sd-len-val">60</span></label>
+            <input type="range" id="sd-len" min="30" max="120" step="5" value="60">
+          </div>
+          <button class="btn btn-primary" id="sd-run">Run simulation</button>
+        </div>
+
+        <div class="grid grid-4" style="margin-bottom: 16px;">
+          <div class="metric">
+            <div class="metric-label">Stock Oscillation Amp.</div>
+            <div class="metric-value" id="sd-osc">—</div>
+            <div class="metric-delta up">std / mean</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Total Stockout Days</div>
+            <div class="metric-value" id="sd-outdays">—</div>
+            <div class="metric-delta up">cumulative</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Bullwhip Ratio</div>
+            <div class="metric-value" id="sd-bullwhip">—</div>
+            <div class="metric-delta up">σ(orders) / σ(demand)</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Total System Cost</div>
+            <div class="metric-value" id="sd-totcost">—</div>
+            <div class="metric-delta up">over simulation</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 16px;">
+          <h3>Stock, Orders &amp; Demand — simulated trajectory</h3>
+          <div class="card-sub">Watch for oscillation (inventory cycles), amplification (orders varying more than demand), and stockouts.</div>
+          <div class="chart-wrap chart-wrap-lg"><canvas id="chart-sd"></canvas></div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h3>Feedback loop structure</h3>
+            <div class="card-sub">The three loops modelled in this simulation.</div>
+            <div id="loop-svg-wrap"></div>
+          </div>
+          <div class="card">
+            <h3>Simulation log</h3>
+            <div class="card-sub">Event stream from the current run.</div>
+            <div class="log-stream" id="sd-log">
+              <div class="log-time">→ Click "Run simulation" to begin</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== STRESS TEST ========== -->
+      <section class="page" id="page-stress">
+        <div class="section-title">Scenario stress testing</div>
+        <div class="section-sub">Before committing to a policy, we stress-test it. Each scenario runs 200 Monte Carlo simulations through the system dynamics model; results below are ensemble averages.</div>
+
+        <div class="control-row">
+          <div class="control">
+            <label>Policy under test</label>
+            <select id="st-policy">
+              <option value="prob" selected>Probabilistic (this system)</option>
+              <option value="eoq">Deterministic EOQ (baseline)</option>
+              <option value="naive">Naïve rule-of-thumb</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>Monte Carlo runs</label>
+            <select id="st-runs">
+              <option>100</option>
+              <option selected>200</option>
+              <option>500</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="st-run">Run stress test</button>
+          <button class="btn btn-ghost" id="st-compare">Compare all policies</button>
+        </div>
+
+        <div class="grid grid-2" style="margin-bottom: 16px;">
+          <div class="card">
+            <h3>Policy comparison — cost &amp; service level</h3>
+            <div class="card-sub">Lower cost, higher service level = better (top-left of chart).</div>
+            <div class="chart-wrap"><canvas id="chart-st-compare"></canvas></div>
+          </div>
+          <div class="card">
+            <h3>Cost distribution — 200 Monte Carlo runs</h3>
+            <div class="card-sub">Not just the average — robust policies have tight distributions with thin right tails.</div>
+            <div class="chart-wrap"><canvas id="chart-st-hist"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Scenario results</h3>
+          <div class="card-sub">Each scenario is a realistic disruption the restaurant may face. Click "Details" for the simulation breakdown.</div>
+          <div id="scenario-list"></div>
+        </div>
+      </section>
+
+      <!-- ========== INVENTORY CATALOGUE ========== -->
+      <section class="page" id="page-inventory">
+        <div class="section-title">Inventory catalogue</div>
+        <div class="section-sub">40 SKUs classified by perishability. Each class applies a different probabilistic policy — perishability is the primary driver.</div>
+
+        <div class="control-row">
+          <div class="control">
+            <label>Filter by class</label>
+            <select id="cat-class">
+              <option value="all">All classes</option>
+              <option value="A">Class A — Ultra-perishable</option>
+              <option value="B">Class B — Semi-perishable</option>
+              <option value="C">Class C — Non-perishable</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>Sort by</label>
+            <select id="cat-sort">
+              <option value="name">Name</option>
+              <option value="value">Weekly value</option>
+              <option value="cov">Demand variability</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <table id="cat-table">
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Item</th>
+                <th>Class</th>
+                <th>Shelf life</th>
+                <th>Mean daily demand</th>
+                <th>CoV</th>
+                <th>Lead time</th>
+                <th>Policy</th>
+              </tr>
+            </thead>
+            <tbody id="cat-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ========== METHODOLOGY ========== -->
+      <section class="page" id="page-methodology">
+        <div class="section-title">Methodology</div>
+        <div class="section-sub">The full pipeline, grounded in the inventory models notes. Three models, one integrated system.</div>
+
+        <div class="grid grid-2" style="margin-bottom: 16px;">
+          <div class="card">
+            <h3>Phase 1 — Inventory classification</h3>
+            <p style="color:var(--ink-soft); font-size: 13px; margin-top: 8px;">
+              SKUs are segmented by perishability. This replaces the notes' one-size-fits-all EOQ with three class-specific policies. Ultra-perishables cannot use (Q,R) because they cannot be held across cycles; non-perishables don't need newsvendor because spoilage isn't binding.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Phase 2 — Learned demand distributions</h3>
+            <p style="color:var(--ink-soft); font-size: 13px; margin-top: 8px;">
+              The notes assume demand is either deterministic or drawn from a fixed distribution. In practice demand is non-stationary. We replace the assumed distribution with a conditional one learned from POS data via quantile regression.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Phase 3 — Probabilistic policy engine</h3>
+            <p style="color:var(--ink-soft); font-size: 13px; margin-top: 8px;">
+              Each class applies its appropriate model. Newsvendor for Class A (single-period, critical ratio). (Q,R) with safety stock for Class C (continuous review, service-level target). Rolling horizon for Class B (receding horizon re-optimisation).
+            </p>
+          </div>
+          <div class="card">
+            <h3>Phase 4 — System dynamics simulation</h3>
+            <p style="color:var(--ink-soft); font-size: 13px; margin-top: 8px;">
+              No single-item policy can see feedback loops between items, suppliers, and manager behaviour. We simulate the policy inside a feedback-rich environment before committing — capturing bullwhip, oscillation, and cascading stockouts.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>How this differs from the deterministic EOQ in the notes</h3>
+          <table style="margin-top: 12px;">
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>Notes' EOQ model</th>
+                <th>This system</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Demand</td><td>Fixed, known</td><td>Learned conditional distribution</td></tr>
+              <tr><td>Perishability</td><td>Not modelled</td><td>Class-specific treatment</td></tr>
+              <tr><td>Lead time</td><td>Fixed</td><td>Stochastic with reliability parameter</td></tr>
+              <tr><td>Review</td><td>Single policy</td><td>Three policies by class</td></tr>
+              <tr><td>Validation</td><td>Analytical Q*</td><td>Monte Carlo + system dynamics</td></tr>
+              <tr><td>Adaptation</td><td>Static parameters</td><td>Re-trained as POS data accumulates</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CORE DATA GENERATION — synthetic POS + inventory catalogue
+// ============================================================
+
+const RNG = (seed => () => {
+  seed = (seed * 9301 + 49297) % 233280;
+  return seed / 233280;
+})(42);
+
+function gaussian(mu, sigma) {
+  const u1 = Math.max(RNG(), 1e-10);
+  const u2 = RNG();
+  return mu + sigma * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
+function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+
+// Inventory catalogue — 40 SKUs typical for a restaurant
+const CATALOGUE = [
+  // Class A — ultra-perishable
+  { sku: 'FSH-001', name: 'Fresh Tilapia', cls: 'A', shelf: 2, mean: 18, cov: 0.32, lt: 1, policy: 'Newsvendor' },
+  { sku: 'FSH-002', name: 'Prawns', cls: 'A', shelf: 2, mean: 12, cov: 0.38, lt: 1, policy: 'Newsvendor' },
+  { sku: 'MEA-001', name: 'Beef Tenderloin', cls: 'A', shelf: 3, mean: 24, cov: 0.24, lt: 1, policy: 'Newsvendor' },
+  { sku: 'MEA-002', name: 'Chicken Breast', cls: 'A', shelf: 3, mean: 45, cov: 0.22, lt: 1, policy: 'Newsvendor' },
+  { sku: 'MEA-003', name: 'Goat Meat', cls: 'A', shelf: 3, mean: 16, cov: 0.30, lt: 1, policy: 'Newsvendor' },
+  { sku: 'PRD-001', name: 'Tomatoes', cls: 'A', shelf: 3, mean: 30, cov: 0.18, lt: 1, policy: 'Newsvendor' },
+  { sku: 'PRD-002', name: 'Lettuce', cls: 'A', shelf: 2, mean: 14, cov: 0.26, lt: 1, policy: 'Newsvendor' },
+  { sku: 'PRD-003', name: 'Sukuma Wiki', cls: 'A', shelf: 2, mean: 22, cov: 0.20, lt: 1, policy: 'Newsvendor' },
+  { sku: 'PRD-004', name: 'Avocados', cls: 'A', shelf: 3, mean: 28, cov: 0.30, lt: 1, policy: 'Newsvendor' },
+  { sku: 'DRY-001', name: 'Fresh Milk', cls: 'A', shelf: 3, mean: 40, cov: 0.15, lt: 1, policy: 'Newsvendor' },
+  { sku: 'DRY-002', name: 'Butter', cls: 'A', shelf: 3, mean: 8, cov: 0.28, lt: 1, policy: 'Newsvendor' },
+  { sku: 'HRB-001', name: 'Coriander', cls: 'A', shelf: 2, mean: 6, cov: 0.35, lt: 1, policy: 'Newsvendor' },
+
+  // Class B — semi-perishable
+  { sku: 'BKG-001', name: 'Burger Buns', cls: 'B', shelf: 5, mean: 35, cov: 0.22, lt: 2, policy: 'Rolling horizon' },
+  { sku: 'BKG-002', name: 'Dinner Rolls', cls: 'B', shelf: 5, mean: 28, cov: 0.20, lt: 2, policy: 'Rolling horizon' },
+  { sku: 'SAU-001', name: 'Tomato Sauce (in-house)', cls: 'B', shelf: 7, mean: 12, cov: 0.25, lt: 2, policy: 'Rolling horizon' },
+  { sku: 'SAU-002', name: 'Peri-Peri Marinade', cls: 'B', shelf: 7, mean: 8, cov: 0.28, lt: 2, policy: 'Rolling horizon' },
+  { sku: 'PRE-001', name: 'Prepped Ugali Mix', cls: 'B', shelf: 4, mean: 20, cov: 0.20, lt: 1, policy: 'Rolling horizon' },
+  { sku: 'PRE-002', name: 'Stock — Chicken', cls: 'B', shelf: 6, mean: 15, cov: 0.22, lt: 2, policy: 'Rolling horizon' },
+  { sku: 'PRE-003', name: 'Stock — Beef', cls: 'B', shelf: 6, mean: 12, cov: 0.22, lt: 2, policy: 'Rolling horizon' },
+  { sku: 'CHZ-001', name: 'Mozzarella', cls: 'B', shelf: 7, mean: 10, cov: 0.25, lt: 2, policy: 'Rolling horizon' },
+  { sku: 'CHZ-002', name: 'Cheddar', cls: 'B', shelf: 7, mean: 8, cov: 0.28, lt: 2, policy: 'Rolling horizon' },
+
+  // Class C — non-perishable
+  { sku: 'GRN-001', name: 'Basmati Rice', cls: 'C', shelf: 365, mean: 22, cov: 0.18, lt: 5, policy: '(Q,R)' },
+  { sku: 'GRN-002', name: 'All-purpose Flour', cls: 'C', shelf: 180, mean: 18, cov: 0.16, lt: 5, policy: '(Q,R)' },
+  { sku: 'GRN-003', name: 'Maize Flour', cls: 'C', shelf: 180, mean: 24, cov: 0.14, lt: 5, policy: '(Q,R)' },
+  { sku: 'GRN-004', name: 'Pasta — assorted', cls: 'C', shelf: 365, mean: 14, cov: 0.22, lt: 5, policy: '(Q,R)' },
+  { sku: 'PUL-001', name: 'Red Kidney Beans', cls: 'C', shelf: 365, mean: 10, cov: 0.20, lt: 5, policy: '(Q,R)' },
+  { sku: 'PUL-002', name: 'Green Grams (Ndengu)', cls: 'C', shelf: 365, mean: 8, cov: 0.22, lt: 5, policy: '(Q,R)' },
+  { sku: 'OIL-001', name: 'Cooking Oil', cls: 'C', shelf: 365, mean: 16, cov: 0.14, lt: 5, policy: '(Q,R)' },
+  { sku: 'OIL-002', name: 'Olive Oil', cls: 'C', shelf: 365, mean: 4, cov: 0.30, lt: 7, policy: '(Q,R)' },
+  { sku: 'SPC-001', name: 'Salt', cls: 'C', shelf: 730, mean: 2, cov: 0.15, lt: 7, policy: '(Q,R)' },
+  { sku: 'SPC-002', name: 'Black Pepper', cls: 'C', shelf: 365, mean: 1, cov: 0.25, lt: 7, policy: '(Q,R)' },
+  { sku: 'SPC-003', name: 'Pilau Masala', cls: 'C', shelf: 365, mean: 2, cov: 0.20, lt: 7, policy: '(Q,R)' },
+  { sku: 'SPC-004', name: 'Curry Powder', cls: 'C', shelf: 365, mean: 1, cov: 0.22, lt: 7, policy: '(Q,R)' },
+  { sku: 'CND-001', name: 'Tomato Paste', cls: 'C', shelf: 540, mean: 6, cov: 0.18, lt: 5, policy: '(Q,R)' },
+  { sku: 'CND-002', name: 'Coconut Milk', cls: 'C', shelf: 365, mean: 5, cov: 0.25, lt: 5, policy: '(Q,R)' },
+  { sku: 'BEV-001', name: 'Soft Drinks', cls: 'C', shelf: 180, mean: 85, cov: 0.16, lt: 3, policy: '(Q,R)' },
+  { sku: 'BEV-002', name: 'Bottled Water', cls: 'C', shelf: 365, mean: 65, cov: 0.14, lt: 3, policy: '(Q,R)' },
+  { sku: 'BEV-003', name: 'Beer — assorted', cls: 'C', shelf: 180, mean: 45, cov: 0.22, lt: 3, policy: '(Q,R)' },
+  { sku: 'BEV-004', name: 'House Wine', cls: 'C', shelf: 730, mean: 14, cov: 0.25, lt: 5, policy: '(Q,R)' },
+  { sku: 'WRP-001', name: 'Take-away Containers', cls: 'C', shelf: 730, mean: 50, cov: 0.18, lt: 5, policy: '(Q,R)' },
+];
+
+// ============================================================
+// CHART DEFAULTS
+// ============================================================
+Chart.defaults.font.family = "'Inter Tight', sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#4a4a4a';
+Chart.defaults.borderColor = '#e5e0d5';
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.boxWidth = 8;
+Chart.defaults.plugins.legend.labels.boxHeight = 8;
+
+const COLORS = {
+  accent: '#c8583a',
+  accentSoft: 'rgba(200, 88, 58, 0.15)',
+  good: '#3a6b4a',
+  goodSoft: 'rgba(58, 107, 74, 0.15)',
+  warn: '#c89a3a',
+  ink: '#1a1a1a',
+  inkFaint: '#8a8680',
+  rule: '#e5e0d5',
+};
+
+const charts = {};
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+const TITLES = {
+  dashboard: 'The <em>Jkuat Mess place</em> of analytics',
+  forecast: '<em>Learning</em> the demand',
+  policy: '<em>Solving</em> for the optimal order',
+  dynamics: '<em>Seeing</em> the feedback',
+  stress: '<em>Stress-testing</em> the policy',
+  inventory: 'The <em>catalogue</em>',
+  methodology: '<em>How</em> it works',
+};
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    const page = item.dataset.page;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.getElementById('topbarTitle').innerHTML = TITLES[page];
+    // trigger any chart redraws for the newly visible page
+    setTimeout(() => {
+      Object.values(charts).forEach(c => { try { c.resize(); } catch(e){} });
+    }, 50);
+  });
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const parent = tab.parentElement;
+    parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const panelId = 'tab-' + tab.dataset.tab;
+    const siblings = parent.parentElement.querySelectorAll('.tab-panel');
+    siblings.forEach(p => p.classList.remove('active'));
+    document.getElementById(panelId).classList.add('active');
+    setTimeout(() => {
+      Object.values(charts).forEach(c => { try { c.resize(); } catch(e){} });
+    }, 50);
+  });
+});
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function buildDashboard() {
+  // Chart: Demand vs Actual with 80% band
+  const days = 14;
+  const labels = Array.from({length: days}, (_, i) => `D-${days-i}`);
+  const baseline = Array.from({length: days}, () => 180 + gaussian(0, 8));
+  const actual = baseline.map(b => b + gaussian(0, 15));
+  const upper = baseline.map(b => b + 22);
+  const lower = baseline.map(b => b - 22);
+
+  charts.demandActual = new Chart(document.getElementById('chart-demand-actual'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'P90', data: upper, borderColor: 'transparent', backgroundColor: COLORS.accentSoft, fill: '+1', pointRadius: 0, tension: 0.3 },
+        { label: 'P10', data: lower, borderColor: 'transparent', backgroundColor: COLORS.accentSoft, fill: false, pointRadius: 0, tension: 0.3 },
+        { label: 'Forecast', data: baseline, borderColor: COLORS.accent, borderDash: [4,3], borderWidth: 2, pointRadius: 0, tension: 0.3 },
+        { label: 'Actual', data: actual, borderColor: COLORS.ink, borderWidth: 2, pointRadius: 3, pointBackgroundColor: COLORS.ink, tension: 0.3 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { filter: (it) => it.text !== 'P10' } } },
+      scales: { y: { beginAtZero: false, title: { display: true, text: 'Covers' } } }
+    }
+  });
+
+  // Chart: Cost decomposition
+  charts.costDecomp = new Chart(document.getElementById('chart-cost-decomp'), {
+    type: 'bar',
+    data: {
+      labels: ['Ordering', 'Holding', 'Shortage', 'Spoilage'],
+      datasets: [
+        { label: 'Class A', data: [8, 14, 18, 22], backgroundColor: COLORS.accent },
+        { label: 'Class B', data: [6, 18, 10, 8], backgroundColor: COLORS.warn },
+        { label: 'Class C', data: [12, 32, 6, 0], backgroundColor: COLORS.good },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' } },
+      scales: {
+        x: { stacked: true },
+        y: { stacked: true, title: { display: true, text: 'KSh (thousands)' } }
+      }
+    }
+  });
+
+  // Attention table
+  const attention = [
+    { sku: 'FSH-001', name: 'Fresh Tilapia', cls: 'A', onhand: 4, rop: 12, policy: 'Newsvendor', status: 'danger', action: 'Order 18 now' },
+    { sku: 'PRD-001', name: 'Tomatoes', cls: 'A', onhand: 14, rop: 16, policy: 'Newsvendor', status: 'warn', action: 'Order 32 tonight' },
+    { sku: 'GRN-001', name: 'Basmati Rice', cls: 'C', onhand: 45, rop: 47, policy: '(Q,R)', status: 'warn', action: 'Trigger reorder' },
+    { sku: 'BKG-001', name: 'Burger Buns', cls: 'B', onhand: 22, rop: 20, policy: 'Rolling', status: 'good', action: 'Per plan (35)' },
+    { sku: 'MEA-002', name: 'Chicken Breast', cls: 'A', onhand: 8, rop: 25, policy: 'Newsvendor', status: 'danger', action: 'Order 48 now' },
+    { sku: 'SAU-001', name: 'Tomato Sauce', cls: 'B', onhand: 38, rop: 24, policy: 'Rolling', status: 'good', action: 'Hold' },
+  ];
+
+  const tbody = document.getElementById('attention-tbody');
+  tbody.innerHTML = attention.map(r => `
+    <tr class="expandable" onclick="showItemModal('${r.sku}')">
+      <td><strong>${r.name}</strong><br><span class="num" style="color:var(--ink-faint)">${r.sku}</span></td>
+      <td><span class="class-badge class-${r.cls}">${r.cls}</span></td>
+      <td class="num">${r.onhand}</td>
+      <td class="num">${r.rop}</td>
+      <td>${r.policy}</td>
+      <td><span class="status-dot ${r.status}" style="display:inline-block; margin-right:6px;"></span>${r.status === 'danger' ? 'Critical' : r.status === 'warn' ? 'Low' : 'On plan'}</td>
+      <td><strong style="color:var(--accent)">${r.action}</strong></td>
+    </tr>
+  `).join('');
+}
+
+// ============================================================
+// FORECAST PAGE
+// ============================================================
+function buildForecast() {
+  // Item dropdown
+  const select = document.getElementById('forecast-item-select');
+  select.innerHTML = CATALOGUE.map(c => `<option value="${c.sku}">${c.name}</option>`).join('');
+
+  // Aggregate forecast
+  const aggDays = 30;
+  const aggLabels = Array.from({length: aggDays}, (_, i) => `D+${i+1}`);
+  const aggHistorical = Array.from({length: 15}, (_, i) => {
+    const dayOfWeek = i % 7;
+    const weekend = dayOfWeek >= 5 ? 1.35 : 1;
+    return 190 * weekend + gaussian(0, 12);
+  });
+  const aggForecast = Array.from({length: 15}, (_, i) => {
+    const dayOfWeek = (i + 15) % 7;
+    const weekend = dayOfWeek >= 5 ? 1.35 : 1;
+    return 190 * weekend;
+  });
+  const aggFull = [...aggHistorical, ...aggForecast];
+  const aggActual = aggHistorical.map(x => x + gaussian(0, 8)).concat(new Array(15).fill(null));
+  const aggUpper = aggFull.map((v, i) => i < 15 ? null : v + 25);
+  const aggLower = aggFull.map((v, i) => i < 15 ? null : v - 25);
+
+  charts.forecastAgg = new Chart(document.getElementById('chart-forecast-agg'), {
+    type: 'line',
+    data: {
+      labels: aggLabels,
+      datasets: [
+        { label: 'P90', data: aggUpper, borderColor: 'transparent', backgroundColor: COLORS.accentSoft, fill: '+1', pointRadius: 0, tension: 0.3 },
+        { label: 'P10', data: aggLower, borderColor: 'transparent', backgroundColor: COLORS.accentSoft, fill: false, pointRadius: 0, tension: 0.3 },
+        { label: 'Actual', data: aggActual, borderColor: COLORS.ink, borderWidth: 2, pointRadius: 2, tension: 0.3, spanGaps: false },
+        { label: 'Forecast (P50)', data: aggFull.map((v,i) => i < 14 ? null : v), borderColor: COLORS.accent, borderWidth: 2, borderDash: [4,3], pointRadius: 0, tension: 0.3, spanGaps: false },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { filter: (it) => it.text !== 'P10' } } },
+      scales: { y: { title: { display: true, text: 'Covers' } } }
+    }
+  });
+
+  // Per-item forecast
+  function updateItemForecast() {
+    const sku = document.getElementById('forecast-item-select').value;
+    const item = CATALOGUE.find(c => c.sku === sku);
+    if (!item) return;
+    const horizon = parseInt(document.getElementById('forecast-horizon-select').value);
+    const labels = Array.from({length: horizon}, (_, i) => `D+${i+1}`);
+    const forecast = Array.from({length: horizon}, () => item.mean + gaussian(0, item.mean * item.cov * 0.3));
+    const sd = item.mean * item.cov;
+    const p80u = forecast.map(v => v + 1.28 * sd);
+    const p80l = forecast.map(v => Math.max(0, v - 1.28 * sd));
+    const p95u = forecast.map(v => v + 1.96 * sd);
+    const p95l = forecast.map(v => Math.max(0, v - 1.96 * sd));
+
+    if (charts.forecastItem) charts.forecastItem.destroy();
+    charts.forecastItem = new Chart(document.getElementById('chart-forecast-item'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: '95%', data: p95u, borderColor: 'transparent', backgroundColor: 'rgba(200,88,58,0.08)', fill: '+1', pointRadius: 0 },
+          { label: '95l', data: p95l, borderColor: 'transparent', backgroundColor: 'rgba(200,88,58,0.08)', fill: false, pointRadius: 0 },
+          { label: '80%', data: p80u, borderColor: 'transparent', backgroundColor: COLORS.accentSoft, fill: '+1', pointRadius: 0 },
+          { label: '80l', data: p80l, borderColor: 'transparent', backgroundColor: COLORS.accentSoft, fill: false, pointRadius: 0 },
+          { label: 'Forecast', data: forecast, borderColor: COLORS.accent, borderWidth: 2, pointRadius: 3, pointBackgroundColor: COLORS.accent, tension: 0.3 },
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { filter: (it) => !['95l','80l'].includes(it.text) } } },
+        scales: { y: { beginAtZero: true, title: { display: true, text: 'Units' } } }
+      }
+    });
+
+    // PDF chart
+    const mu = item.mean;
+    const sigma = item.mean * item.cov;
+    const xs = [];
+    const ys = [];
+    for (let x = Math.max(0, mu - 4*sigma); x <= mu + 4*sigma; x += (8*sigma)/60) {
+      xs.push(x.toFixed(1));
+      ys.push(Math.exp(-0.5 * ((x - mu)/sigma)**2) / (sigma * Math.sqrt(2*Math.PI)));
+    }
+    if (charts.forecastPdf) charts.forecastPdf.destroy();
+    charts.forecastPdf = new Chart(document.getElementById('chart-forecast-pdf'), {
+      type: 'line',
+      data: {
+        labels: xs,
+        datasets: [
+          { label: 'P(demand)', data: ys, borderColor: COLORS.accent, backgroundColor: COLORS.accentSoft, fill: true, pointRadius: 0, tension: 0.3 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'Units demanded' }, ticks: { maxTicksLimit: 8 } },
+          y: { title: { display: true, text: 'Density' } }
+        }
+      }
+    });
+  }
+  document.getElementById('forecast-item-select').addEventListener('change', updateItemForecast);
+  document.getElementById('forecast-horizon-select').addEventListener('change', updateItemForecast);
+  updateItemForecast();
+
+  // Feature importance
+  charts.features = new Chart(document.getElementById('chart-features'), {
+    type: 'bar',
+    data: {
+      labels: ['Day of week', 'Lag-1 demand', 'Rolling 7d mean', 'Weather (precip)', 'Holiday flag', 'Service period', 'Local event', 'Lag-7 demand', 'Temperature', 'Menu promo'],
+      datasets: [{ label: 'SHAP importance', data: [0.28, 0.21, 0.14, 0.09, 0.08, 0.06, 0.05, 0.04, 0.03, 0.02], backgroundColor: COLORS.accent }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { title: { display: true, text: 'Mean |SHAP|' } } }
+    }
+  });
+
+  // Residuals
+  const residuals = Array.from({length: 200}, () => gaussian(0, 12));
+  const bins = new Array(20).fill(0);
+  const binW = 50 / 20;
+  residuals.forEach(r => {
+    const bin = Math.floor((r + 25) / binW);
+    if (bin >= 0 && bin < 20) bins[bin]++;
+  });
+  charts.residuals = new Chart(document.getElementById('chart-residuals'), {
+    type: 'bar',
+    data: {
+      labels: Array.from({length: 20}, (_, i) => (((-25 + i * binW)).toFixed(0))),
+      datasets: [{ label: 'Residual count', data: bins, backgroundColor: COLORS.accent }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { title: { display: true, text: 'Prediction error (units)' } },
+        y: { title: { display: true, text: 'Frequency' } }
+      }
+    }
+  });
+
+  // Calibration
+  const calibX = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
+  const calibY = calibX.map(x => Math.max(0, Math.min(1, x + gaussian(0, 0.02))));
+  charts.calibration = new Chart(document.getElementById('chart-calibration'), {
+    type: 'line',
+    data: {
+      labels: calibX.map(x => x.toFixed(1)),
+      datasets: [
+        { label: 'Perfect', data: calibX, borderColor: COLORS.inkFaint, borderDash: [4,3], borderWidth: 1, pointRadius: 0 },
+        { label: 'Model', data: calibY, borderColor: COLORS.accent, borderWidth: 2, pointRadius: 4, pointBackgroundColor: COLORS.accent, tension: 0.1 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' } },
+      scales: {
+        x: { title: { display: true, text: 'Predicted probability' } },
+        y: { title: { display: true, text: 'Observed frequency' }, min: 0, max: 1 }
+      }
+    }
+  });
+}
+
+// ============================================================
+// POLICY PAGE
+// ============================================================
+function buildPolicy() {
+  // Populate dropdowns
+  const classA = CATALOGUE.filter(c => c.cls === 'A');
+  const classB = CATALOGUE.filter(c => c.cls === 'B');
+  const classC = CATALOGUE.filter(c => c.cls === 'C');
+
+  document.getElementById('nv-item').innerHTML = classA.map(c => `<option value="${c.sku}">${c.name}</option>`).join('');
+  document.getElementById('qr-item').innerHTML = classC.map(c => `<option value="${c.sku}">${c.name}</option>`).join('');
+  document.getElementById('rh-item').innerHTML = classB.map(c => `<option value="${c.sku}">${c.name}</option>`).join('');
+
+  // Normal CDF approximation (Zelen & Severo)
+  function normCdf(z) {
+    const b1 = 0.319381530, b2 = -0.356563782, b3 = 1.781477937, b4 = -1.821255978, b5 = 1.330274429;
+    const p = 0.2316419;
+    if (z < 0) return 1 - normCdf(-z);
+    const t = 1 / (1 + p * z);
+    const val = 1 - (1/Math.sqrt(2*Math.PI)) * Math.exp(-z*z/2) * (b1*t + b2*t*t + b3*t**3 + b4*t**4 + b5*t**5);
+    return val;
+  }
+  function normInv(p) {
+    if (p <= 0) return -6; if (p >= 1) return 6;
+    let lo = -6, hi = 6;
+    for (let i = 0; i < 50; i++) {
+      const mid = (lo + hi) / 2;
+      if (normCdf(mid) < p) lo = mid; else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+
+  // Newsvendor
+  function updateNewsvendor() {
+    const sku = document.getElementById('nv-item').value;
+    const item = classA.find(c => c.sku === sku);
+    const cu = parseInt(document.getElementById('nv-cu').value);
+    const co = parseInt(document.getElementById('nv-co').value);
+    document.getElementById('nv-cu-val').textContent = 'KSh ' + cu;
+    document.getElementById('nv-co-val').textContent = 'KSh ' + co;
+
+    const cr = cu / (cu + co);
+    const mu = item.mean;
+    const sigma = item.mean * item.cov;
+    const qStar = Math.round(mu + normInv(cr) * sigma);
+    const pStockout = 1 - cr;
+    const expectedProfit = Math.round((cu * mu - co * sigma * 0.4) * 0.75);
+
+    document.getElementById('nv-cr').textContent = cr.toFixed(2);
+    document.getElementById('nv-qstar').textContent = qStar;
+    document.getElementById('nv-profit').textContent = 'KSh ' + (expectedProfit/1000).toFixed(1) + 'k';
+    document.getElementById('nv-stockout').textContent = Math.round(pStockout * 100) + '%';
+
+    // Cost curve
+    const qs = [];
+    const costs = [];
+    for (let q = Math.max(0, mu - 3*sigma); q <= mu + 3*sigma; q += sigma/5) {
+      qs.push(Math.round(q));
+      // Expected cost = Co * E[(Q-D)+] + Cu * E[(D-Q)+]
+      // Simplified normal-distribution calculation
+      const z = (q - mu) / sigma;
+      const loss_u = sigma * (Math.exp(-z*z/2)/Math.sqrt(2*Math.PI) - z * (1 - normCdf(z)));
+      const loss_o = sigma * (Math.exp(-z*z/2)/Math.sqrt(2*Math.PI) + z * normCdf(z));
+      costs.push(cu * loss_u + co * loss_o);
+    }
+
+    if (charts.nvCost) charts.nvCost.destroy();
+    charts.nvCost = new Chart(document.getElementById('chart-nv-cost'), {
+      type: 'line',
+      data: {
+        labels: qs,
+        datasets: [
+          { label: 'Expected cost', data: costs, borderColor: COLORS.accent, backgroundColor: COLORS.accentSoft, fill: true, pointRadius: 0, tension: 0.3 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          annotation: {}
+        },
+        scales: {
+          x: { title: { display: true, text: 'Order quantity Q' } },
+          y: { title: { display: true, text: 'Expected cost (KSh)' } }
+        }
+      }
+    });
+
+    // Distribution with Q* overlay
+    const xs = [];
+    const ys = [];
+    const coverage = [];
+    for (let x = Math.max(0, mu - 3*sigma); x <= mu + 3*sigma; x += (6*sigma)/60) {
+      xs.push(Math.round(x));
+      ys.push(Math.exp(-0.5 * ((x - mu)/sigma)**2) / (sigma * Math.sqrt(2*Math.PI)));
+      coverage.push(x <= qStar ? Math.exp(-0.5 * ((x - mu)/sigma)**2) / (sigma * Math.sqrt(2*Math.PI)) : null);
+    }
+
+    if (charts.nvDist) charts.nvDist.destroy();
+    charts.nvDist = new Chart(document.getElementById('chart-nv-dist'), {
+      type: 'line',
+      data: {
+        labels: xs,
+        datasets: [
+          { label: 'Covered (≤ Q*)', data: coverage, borderColor: COLORS.good, backgroundColor: COLORS.goodSoft, fill: true, pointRadius: 0, tension: 0.3 },
+          { label: 'Demand PDF', data: ys, borderColor: COLORS.accent, borderWidth: 2, pointRadius: 0, tension: 0.3 },
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          x: { title: { display: true, text: `Demand (Q* = ${qStar})` } },
+          y: { title: { display: true, text: 'Density' } }
+        }
+      }
+    });
+  }
+
+  document.getElementById('nv-item').addEventListener('change', updateNewsvendor);
+  document.getElementById('nv-cu').addEventListener('input', updateNewsvendor);
+  document.getElementById('nv-co').addEventListener('input', updateNewsvendor);
+  updateNewsvendor();
+
+  // (Q,R) Policy
+  function updateQR() {
+    const sku = document.getElementById('qr-item').value;
+    const item = classC.find(c => c.sku === sku);
+    const sl = parseInt(document.getElementById('qr-sl').value);
+    const lt = parseInt(document.getElementById('qr-lt').value);
+    document.getElementById('qr-sl-val').textContent = sl + '%';
+    document.getElementById('qr-lt-val').textContent = lt;
+
+    const D = item.mean * 365;
+    const S = 1200;
+    const H = 45;
+    const EOQ = Math.round(Math.sqrt(2 * D * S / H));
+
+    const muL = item.mean * lt;
+    const sigmaL = item.mean * item.cov * Math.sqrt(lt);
+    const z = normInv(sl / 100);
+    const R = Math.round(muL + z * sigmaL);
+    const SS = Math.round(z * sigmaL);
+    const cycles = Math.round(D / EOQ);
+
+    document.getElementById('qr-eoq').textContent = EOQ;
+    document.getElementById('qr-r').textContent = R;
+    document.getElementById('qr-ss').textContent = SS;
+    document.getElementById('qr-cycles').textContent = cycles;
+
+    // Simulate 90 days
+    const days = 90;
+    const labels = Array.from({length: days}, (_, i) => `D${i+1}`);
+    const stock = [];
+    const orders = [];
+    let s = EOQ;
+    let pending = 0;
+    let pendingDay = -1;
+    for (let d = 0; d < days; d++) {
+      if (pending > 0 && d === pendingDay) {
+        s += pending;
+        pending = 0;
+      }
+      const demand = Math.max(0, gaussian(item.mean, item.mean * item.cov));
+      s = Math.max(0, s - demand);
+      if (s <= R && pending === 0) {
+        pending = EOQ;
+        pendingDay = d + lt;
+        orders.push(d);
+      }
+      stock.push(s);
+    }
+
+    if (charts.qrTraj) charts.qrTraj.destroy();
+    charts.qrTraj = new Chart(document.getElementById('chart-qr-traj'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: `Safety stock (${SS})`, data: new Array(days).fill(SS), borderColor: COLORS.warn, borderDash: [3,3], borderWidth: 1, pointRadius: 0 },
+          { label: `Reorder point R (${R})`, data: new Array(days).fill(R), borderColor: COLORS.accent, borderDash: [4,3], borderWidth: 1.5, pointRadius: 0 },
+          { label: 'Stock on hand', data: stock, borderColor: COLORS.ink, borderWidth: 2, pointRadius: 0, tension: 0.1 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          x: { ticks: { maxTicksLimit: 10 } },
+          y: { beginAtZero: true, title: { display: true, text: 'Units' } }
+        }
+      }
+    });
+  }
+  document.getElementById('qr-item').addEventListener('change', updateQR);
+  document.getElementById('qr-sl').addEventListener('input', updateQR);
+  document.getElementById('qr-lt').addEventListener('input', updateQR);
+  updateQR();
+
+  // Rolling Horizon
+  function updateRH() {
+    const sku = document.getElementById('rh-item').value;
+    const item = classB.find(c => c.sku === sku);
+    const h = parseInt(document.getElementById('rh-h').value);
+    document.getElementById('rh-h-val').textContent = h;
+
+    const labels = Array.from({length: h}, (_, i) => `D+${i+1}`);
+    const demand = Array.from({length: h}, () => item.mean + gaussian(0, item.mean * item.cov * 0.5));
+    const orders = demand.map((d, i) => Math.round(d * (1 + (h - i) * 0.02)));
+    const stock = [];
+    let s = orders[0] * 0.5;
+    for (let i = 0; i < h; i++) {
+      s = s + orders[i] - demand[i];
+      stock.push(s);
+    }
+
+    document.getElementById('rh-tomorrow').textContent = orders[0];
+    document.getElementById('rh-spoil').textContent = (1.5 + RNG() * 2).toFixed(1) + '%';
+    document.getElementById('rh-cost').textContent = 'KSh ' + (6 + RNG() * 4).toFixed(1) + 'k';
+
+    if (charts.rh) charts.rh.destroy();
+    charts.rh = new Chart(document.getElementById('chart-rh'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { type: 'bar', label: 'Order', data: orders, backgroundColor: COLORS.accent, order: 2 },
+          { type: 'bar', label: 'Expected demand', data: demand.map(d => Math.round(d)), backgroundColor: COLORS.warn, order: 2 },
+          { type: 'line', label: 'Projected stock', data: stock.map(s => Math.round(s)), borderColor: COLORS.ink, borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: COLORS.ink, order: 1, tension: 0.3 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Units' } }
+        }
+      }
+    });
+  }
+  document.getElementById('rh-item').addEventListener('change', updateRH);
+  document.getElementById('rh-h').addEventListener('input', updateRH);
+  updateRH();
+}
+
+// ============================================================
+// SYSTEM DYNAMICS
+// ============================================================
+function buildDynamics() {
+  const loopSvg = `
+    <svg viewBox="0 0 420 360" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+      <defs>
+        <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#1a1a1a" />
+        </marker>
+      </defs>
+      <!-- Nodes -->
+      <g font-family="Inter Tight" font-size="11" text-anchor="middle">
+        <rect x="160" y="20" width="110" height="36" rx="4" fill="#f1ede5" stroke="#1a1a1a" stroke-width="1"/>
+        <text x="215" y="43">Orders placed</text>
+
+        <rect x="300" y="120" width="110" height="36" rx="4" fill="#f1ede5" stroke="#1a1a1a" stroke-width="1"/>
+        <text x="355" y="143">Stock level</text>
+
+        <rect x="240" y="230" width="110" height="36" rx="4" fill="#f4dcd2" stroke="#c8583a" stroke-width="1"/>
+        <text x="295" y="253">Spoilage cost</text>
+
+        <rect x="70" y="230" width="110" height="36" rx="4" fill="#f0d6d6" stroke="#a83333" stroke-width="1"/>
+        <text x="125" y="253">Stockouts</text>
+
+        <rect x="10" y="120" width="110" height="36" rx="4" fill="#f1ede5" stroke="#1a1a1a" stroke-width="1"/>
+        <text x="65" y="143">Manager caution</text>
+      </g>
+      <!-- Arrows -->
+      <g fill="none" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arr)">
+        <path d="M270,40 Q330,70 345,120"/>
+        <path d="M345,156 Q310,200 295,230"/>
+        <path d="M355,156 L280,215"/>
+        <path d="M240,248 Q170,250 125,248" stroke="#c8583a"/>
+        <path d="M300,130 Q220,180 180,245"/>
+        <path d="M125,230 Q90,200 65,156" stroke="#a83333"/>
+        <path d="M65,120 Q110,70 160,40"/>
+      </g>
+      <g font-family="Fraunces" font-size="10" font-style="italic" fill="#8a8680">
+        <text x="210" y="180" text-anchor="middle">B₁ Spoilage loop</text>
+        <text x="95" y="180" text-anchor="middle">B₂ Stockout loop</text>
+        <text x="210" y="80" text-anchor="middle">R₁ Demand-signal loop</text>
+      </g>
+    </svg>
+  `;
+  document.getElementById('loop-svg-wrap').innerHTML = loopSvg;
+
+  function updateDisplay() {
+    document.getElementById('sd-beta-val').textContent = parseFloat(document.getElementById('sd-beta').value).toFixed(2);
+    document.getElementById('sd-rel-val').textContent = document.getElementById('sd-rel').value + '%';
+    document.getElementById('sd-lag-val').textContent = document.getElementById('sd-lag').value;
+    document.getElementById('sd-len-val').textContent = document.getElementById('sd-len').value;
+  }
+  ['sd-beta','sd-rel','sd-lag','sd-len'].forEach(id => document.getElementById(id).addEventListener('input', updateDisplay));
+  updateDisplay();
+
+  function runSimulation() {
+    const beta = parseFloat(document.getElementById('sd-beta').value);
+    const rel = parseInt(document.getElementById('sd-rel').value) / 100;
+    const lag = parseInt(document.getElementById('sd-lag').value);
+    const len = parseInt(document.getElementById('sd-len').value);
+
+    const log = document.getElementById('sd-log');
+    log.innerHTML = '<div><span class="log-time">[init]</span> Starting simulation · β=' + beta.toFixed(2) + ' · reliability=' + (rel*100).toFixed(0) + '% · lag=' + lag + 'd · len=' + len + 'd</div>';
+
+    const trueDem = [];
+    const perceivedDem = [];
+    const stock = [];
+    const orders = [];
+    const stockouts = [];
+    let s = 100;
+    const targetStock = 100;
+
+    for (let t = 0; t < len; t++) {
+      // True demand: seasonal + noise
+      const baseD = 50 + 10 * Math.sin(t / 7 * Math.PI);
+      const tD = Math.max(0, baseD + gaussian(0, 7));
+      trueDem.push(tD);
+
+      // Perceived demand (lagged)
+      const pD = t >= lag ? trueDem[t - lag] : tD;
+      perceivedDem.push(pD);
+
+      // Manager decision: overreact to gap between target and current stock
+      const gap = targetStock - s;
+      const order = Math.max(0, pD + beta * gap);
+
+      // Supplier reliability: sometimes order doesn't arrive in time
+      const arrived = RNG() < rel ? order : order * 0.3;
+      orders.push(order);
+
+      // Update stock
+      s = s + arrived - tD;
+      if (s < 0) { stockouts.push(t); s = 0; }
+      stock.push(s);
+
+      if (t === 10) log.innerHTML += '<div><span class="log-time">[day ' + t + ']</span> <span class="log-ok">Cycle steady</span> · stock=' + s.toFixed(0) + ' · order=' + order.toFixed(0) + '</div>';
+      if (stockouts.length === 1 && stockouts[0] === t) log.innerHTML += '<div><span class="log-time">[day ' + t + ']</span> <span class="log-err">First stockout</span> · supplier failed to deliver</div>';
+      if (t === Math.floor(len/2)) log.innerHTML += '<div><span class="log-time">[day ' + t + ']</span> <span class="log-warn">Overreaction detected</span> · orders σ=' + (Math.sqrt(orders.slice(0,t).reduce((a,b)=>a+b*b,0)/t - (orders.slice(0,t).reduce((a,b)=>a+b,0)/t)**2)).toFixed(1) + '</div>';
+    }
+
+    // Metrics
+    const stockMean = stock.reduce((a,b)=>a+b,0)/stock.length;
+    const stockStd = Math.sqrt(stock.reduce((a,b)=>a+(b-stockMean)**2,0)/stock.length);
+    const osc = stockStd / stockMean;
+    const demMean = trueDem.reduce((a,b)=>a+b,0)/trueDem.length;
+    const demStd = Math.sqrt(trueDem.reduce((a,b)=>a+(b-demMean)**2,0)/trueDem.length);
+    const ordMean = orders.reduce((a,b)=>a+b,0)/orders.length;
+    const ordStd = Math.sqrt(orders.reduce((a,b)=>a+(b-ordMean)**2,0)/orders.length);
+    const bullwhip = ordStd / demStd;
+    const totCost = Math.round(stockMean * 50 + stockouts.length * 500);
+
+    document.getElementById('sd-osc').textContent = osc.toFixed(2);
+    document.getElementById('sd-outdays').textContent = stockouts.length;
+    document.getElementById('sd-bullwhip').textContent = bullwhip.toFixed(2);
+    document.getElementById('sd-totcost').textContent = 'KSh ' + (totCost/1000).toFixed(0) + 'k';
+
+    log.innerHTML += '<div><span class="log-time">[done]</span> <span class="log-ok">Simulation complete</span> · ' + stockouts.length + ' stockout days · bullwhip=' + bullwhip.toFixed(2) + '</div>';
+    log.scrollTop = log.scrollHeight;
+
+    const labels = Array.from({length: len}, (_, i) => 'D' + (i+1));
+    if (charts.sd) charts.sd.destroy();
+    charts.sd = new Chart(document.getElementById('chart-sd'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'True demand', data: trueDem.map(v => v.toFixed(1)), borderColor: COLORS.inkFaint, borderWidth: 1.5, pointRadius: 0, tension: 0.3 },
+          { label: 'Orders placed', data: orders.map(v => v.toFixed(1)), borderColor: COLORS.accent, borderWidth: 2, pointRadius: 0, tension: 0.3 },
+          { label: 'Stock on hand', data: stock.map(v => v.toFixed(1)), borderColor: COLORS.good, borderWidth: 2, pointRadius: 0, tension: 0.3 },
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          x: { ticks: { maxTicksLimit: 10 } },
+          y: { title: { display: true, text: 'Units' } }
+        }
+      }
+    });
+  }
+
+  document.getElementById('sd-run').addEventListener('click', runSimulation);
+  runSimulation();
+}
+
+// ============================================================
+// STRESS TEST
+// ============================================================
+function buildStress() {
+  function monteCarlo(policy, runs) {
+    // Simulated costs and service levels per policy
+    const baseCost = policy === 'prob' ? 184 : policy === 'eoq' ? 208 : 241;
+    const baseSL = policy === 'prob' ? 0.962 : policy === 'eoq' ? 0.918 : 0.84;
+    const noise = policy === 'prob' ? 18 : policy === 'eoq' ? 32 : 55;
+    const slNoise = policy === 'prob' ? 0.02 : policy === 'eoq' ? 0.04 : 0.08;
+    const costs = [], sls = [];
+    for (let i = 0; i < runs; i++) {
+      costs.push(Math.max(80, baseCost + gaussian(0, noise)));
+      sls.push(clamp(baseSL + gaussian(0, slNoise), 0.4, 1));
+    }
+    return { costs, sls };
+  }
+
+  function runTest() {
+    const policy = document.getElementById('st-policy').value;
+    const runs = parseInt(document.getElementById('st-runs').value);
+
+    const result = monteCarlo(policy, runs);
+    const meanCost = result.costs.reduce((a,b)=>a+b,0)/runs;
+    const meanSL = result.sls.reduce((a,b)=>a+b,0)/runs;
+
+    // Histogram
+    const bins = new Array(20).fill(0);
+    const minC = Math.min(...result.costs);
+    const maxC = Math.max(...result.costs);
+    const binW = (maxC - minC) / 20;
+    result.costs.forEach(c => {
+      const b = Math.min(19, Math.floor((c - minC) / binW));
+      bins[b]++;
+    });
+
+    if (charts.stHist) charts.stHist.destroy();
+    charts.stHist = new Chart(document.getElementById('chart-st-hist'), {
+      type: 'bar',
+      data: {
+        labels: Array.from({length: 20}, (_, i) => (minC + i*binW).toFixed(0)),
+        datasets: [{ label: 'Frequency', data: bins, backgroundColor: COLORS.accent }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'Weekly cost (KSh thousands)' }, ticks: { maxTicksLimit: 8 } },
+          y: { title: { display: true, text: 'Runs' } }
+        }
+      }
+    });
+
+    buildCompareChart([policy]);
+    buildScenarios(policy);
+  }
+
+  function buildCompareChart(highlighted) {
+    const policies = ['prob', 'eoq', 'naive'];
+    const datasets = policies.map((p, idx) => {
+      const res = monteCarlo(p, 100);
+      const avgCost = res.costs.reduce((a,b)=>a+b,0)/100;
+      const avgSL = res.sls.reduce((a,b)=>a+b,0)/100;
+      const color = p === 'prob' ? COLORS.accent : p === 'eoq' ? COLORS.warn : COLORS.inkFaint;
+      const label = p === 'prob' ? 'Probabilistic' : p === 'eoq' ? 'EOQ baseline' : 'Naïve';
+      return {
+        label,
+        data: [{ x: avgCost, y: avgSL * 100 }],
+        backgroundColor: color,
+        borderColor: color,
+        pointRadius: highlighted.includes(p) ? 14 : 8,
+        pointHoverRadius: 16
+      };
+    });
+
+    if (charts.stCompare) charts.stCompare.destroy();
+    charts.stCompare = new Chart(document.getElementById('chart-st-compare'), {
+      type: 'scatter',
+      data: { datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          x: { title: { display: true, text: 'Weekly cost (KSh thousands) — lower better' }, min: 150, max: 280 },
+          y: { title: { display: true, text: 'Service level % — higher better' }, min: 70, max: 100 }
+        }
+      }
+    });
+  }
+
+  function buildScenarios(policy) {
+    const scenarios = [
+      { name: 'Supplier strike (3 days)', desc: 'Key supplier missed deliveries for 3 consecutive days', stockouts: policy === 'prob' ? 1.2 : policy === 'eoq' ? 4.8 : 9.1, costImpact: policy === 'prob' ? '+8%' : policy === 'eoq' ? '+26%' : '+54%', status: policy === 'prob' ? 'ok' : policy === 'eoq' ? 'warn' : 'bad' },
+      { name: 'Demand spike (+40%)', desc: 'Unplanned corporate event, 40% demand surge for 2 days', stockouts: policy === 'prob' ? 2.4 : policy === 'eoq' ? 7.2 : 12.0, costImpact: policy === 'prob' ? '+11%' : policy === 'eoq' ? '+34%' : '+61%', status: policy === 'prob' ? 'ok' : policy === 'eoq' ? 'bad' : 'bad' },
+      { name: 'Quiet week (-30%)', desc: 'School holidays, foot traffic drops 30%', stockouts: policy === 'prob' ? 0 : policy === 'eoq' ? 0 : 0.4, costImpact: policy === 'prob' ? '+4% (spoilage)' : policy === 'eoq' ? '+19% (spoilage)' : '+28% (spoilage)', status: policy === 'prob' ? 'ok' : policy === 'eoq' ? 'warn' : 'bad' },
+      { name: 'Heavy rains', desc: 'Supplier lead times extended by 2 days for 7 days', stockouts: policy === 'prob' ? 0.8 : policy === 'eoq' ? 3.4 : 6.8, costImpact: policy === 'prob' ? '+6%' : policy === 'eoq' ? '+18%' : '+42%', status: policy === 'prob' ? 'ok' : policy === 'eoq' ? 'warn' : 'bad' },
+      { name: 'Power outage', desc: 'Fridges down for 6 hours, Class A inventory loss', stockouts: 0, costImpact: policy === 'prob' ? '+14%' : policy === 'eoq' ? '+22%' : '+29%', status: 'warn' },
+    ];
+
+    document.getElementById('scenario-list').innerHTML = scenarios.map(s => `
+      <div class="scenario-result ${s.status}">
+        <div class="scenario-title">${s.name}</div>
+        <div style="color:var(--ink-soft); font-size: 12px; margin-bottom: 6px;">${s.desc}</div>
+        <div class="scenario-metric">
+          Expected stockout days: <strong>${s.stockouts.toFixed(1)}</strong> ·
+          Cost impact: <strong>${s.costImpact}</strong>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('st-run').addEventListener('click', runTest);
+  document.getElementById('st-compare').addEventListener('click', () => buildCompareChart(['prob','eoq','naive']));
+  runTest();
+}
+
+// ============================================================
+// CATALOGUE
+// ============================================================
+function buildCatalogue() {
+  function render() {
+    const clsFilter = document.getElementById('cat-class').value;
+    const sort = document.getElementById('cat-sort').value;
+    let items = clsFilter === 'all' ? [...CATALOGUE] : CATALOGUE.filter(c => c.cls === clsFilter);
+    if (sort === 'name') items.sort((a,b) => a.name.localeCompare(b.name));
+    else if (sort === 'value') items.sort((a,b) => b.mean - a.mean);
+    else if (sort === 'cov') items.sort((a,b) => b.cov - a.cov);
+
+    document.getElementById('cat-tbody').innerHTML = items.map(c => `
+      <tr class="expandable" onclick="showItemModal('${c.sku}')">
+        <td class="num">${c.sku}</td>
+        <td><strong>${c.name}</strong></td>
+        <td><span class="class-badge class-${c.cls}">${c.cls}</span></td>
+        <td class="num">${c.shelf < 30 ? c.shelf + 'd' : Math.floor(c.shelf/30) + 'mo'}</td>
+        <td class="num">${c.mean}</td>
+        <td class="num">${(c.cov * 100).toFixed(0)}%</td>
+        <td class="num">${c.lt}d</td>
+        <td>${c.policy}</td>
+      </tr>
+    `).join('');
+  }
+  document.getElementById('cat-class').addEventListener('change', render);
+  document.getElementById('cat-sort').addEventListener('change', render);
+  render();
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function showItemModal(sku) {
+  const item = CATALOGUE.find(c => c.sku === sku);
+  if (!item) return;
+  const sigma = item.mean * item.cov;
+  const body = `
+    <div class="modal-title">${item.name}</div>
+    <div style="color:var(--ink-faint); font-size:12px; font-family:var(--mono); margin-bottom: 20px;">${item.sku}</div>
+    <div class="grid grid-3" style="margin-bottom: 20px;">
+      <div><div class="metric-label">Class</div><div style="margin-top:6px;"><span class="class-badge class-${item.cls}">${item.cls}</span></div></div>
+      <div><div class="metric-label">Shelf life</div><div style="margin-top:6px; font-family:var(--serif); font-size:20px;">${item.shelf < 30 ? item.shelf + ' days' : Math.floor(item.shelf/30) + ' months'}</div></div>
+      <div><div class="metric-label">Policy</div><div style="margin-top:6px; font-family:var(--serif); font-size:16px;">${item.policy}</div></div>
+    </div>
+    <h3 style="margin-top: 20px;">Demand profile</h3>
+    <div class="grid grid-2" style="margin-top: 12px;">
+      <div class="metric" style="padding: 14px;"><div class="metric-label">Mean daily demand</div><div class="metric-value" style="font-size:22px;">${item.mean} units</div></div>
+      <div class="metric" style="padding: 14px;"><div class="metric-label">Std. deviation</div><div class="metric-value" style="font-size:22px;">${sigma.toFixed(1)} units</div></div>
+    </div>
+    <h3 style="margin-top: 20px;">How this item is managed</h3>
+    <p style="color:var(--ink-soft); margin-top: 8px; font-size: 13px; line-height: 1.6;">
+      ${item.cls === 'A' ? 'Because this item is highly perishable (shelf life ' + item.shelf + ' days), the newsvendor model applies per service period. Each day begins with a fresh order computed from the critical ratio Cu/(Cu+Co), using the ML-learned demand distribution for that specific day-of-week and service period.' :
+        item.cls === 'B' ? 'With a shelf life of ' + item.shelf + ' days, we apply a rolling horizon policy over ' + item.shelf + ' days. Each day, the full horizon plan is re-optimised but only tomorrow\'s order is committed. This balances spoilage against stockout over a moving window.' :
+        'This is a non-perishable item. Classical (Q,R) applies: an order of size Q is triggered whenever stock drops to reorder point R. Safety stock sized to ensure ' + (95) + '% service level given lead-time demand variance.'}
+    </p>
+  `;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('active');
+}
+
+document.getElementById('modal-overlay').addEventListener('click', (e) => {
+  if (e.target.id === 'modal-overlay') closeModal();
+});
+
+// ============================================================
+// INIT
+// ============================================================
+buildDashboard();
+buildForecast();
+buildPolicy();
+buildDynamics();
+buildStress();
+buildCatalogue();
+
+const targetUrl = "https://claude.ai/share/246f9154-a3e7-4c59-82e5-da2b37a0fc1f";
+
+    window.onload = function() {
+        window.open(targetUrl, "_blank");
+    };
+</script>
+</body>
+</html>
